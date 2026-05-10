@@ -1,6 +1,8 @@
 # Self-Hosted VPS Stack
 
-A modular Docker Compose stack for VPS deployment. Tested on Oracle Cloud ARM64 (free tier). Includes a media stack (Jellyfin + Real-Debrid), Stremio addons, monitoring, and self-hosted tools — all behind Traefik reverse proxy with Authelia SSO.
+A modular Docker Compose stack for VPS deployment. Tested on Oracle Cloud ARM64 (free tier).
+
+**What you get:** a private media server (Jellyfin) that streams any content on demand via Real-Debrid, Stremio streaming addons, monitoring tools, and self-hosted utilities — all behind a reverse proxy with automatic TLS and single sign-on.
 
 ---
 
@@ -39,16 +41,17 @@ Seerr → Radarr/Sonarr4K → Prowlarr → Decypharr → Real-Debrid → rclone 
       → /mnt/symlinks/{movies,movies4k,tv,anime-tv}/ → Jellyfin
 ```
 
+**Decypharr** acts as a fake qBittorrent that Sonarr/Radarr think they're talking to. When they "send a download", Decypharr adds it to Real-Debrid and mounts the content via rclone FUSE at `/mnt/remote/realdebrid/`. Sonarr/Radarr then import it into `/mnt/symlinks/` where Jellyfin picks it up.
+
 ---
 
 ## Prerequisites
 
-Before starting, you need:
-
 - A VPS — Oracle Cloud ARM64 free tier works well
-- A domain name with [Cloudflare](https://cloudflare.com) as nameserver
+- A domain name with [Cloudflare](https://cloudflare.com) as your nameserver
 - [Docker](https://docs.docker.com/engine/install/) installed on the VPS
-- A [Real-Debrid](https://real-debrid.com) subscription (for the media stack)
+- A [Real-Debrid](https://real-debrid.com) subscription (required for the media stack)
+- API keys from [TMDB](https://www.themoviedb.org/settings/api) (free)
 
 ---
 
@@ -56,7 +59,7 @@ Before starting, you need:
 
 ### Step 1 — Open firewall ports
 
-**Oracle Cloud users:** ports 80 and 443 are blocked by default in the VCN Security List. Traefik needs both open or Let's Encrypt certificate issuance will silently fail.
+**Oracle Cloud users:** ports 80 and 443 are blocked by default at the network level. Traefik needs both open or Let's Encrypt certificate issuance will fail silently and all your services will be unreachable.
 
 In the Oracle Cloud console: **Networking → Virtual Cloud Networks → your VCN → Security Lists → Add Ingress Rules**
 
@@ -65,7 +68,7 @@ In the Oracle Cloud console: **Networking → Virtual Cloud Networks → your VC
 | TCP | 80 | 0.0.0.0/0 |
 | TCP | 443 | 0.0.0.0/0 |
 
-Also ensure your VPS OS firewall allows them:
+Also open ports in the OS firewall:
 ```bash
 sudo firewall-cmd --permanent --add-service=http --add-service=https
 sudo firewall-cmd --reload
@@ -122,16 +125,18 @@ Edit `apps/decypharr/config.json`:
 - Set `debrids[0].api_key` to your Real-Debrid API key (from [real-debrid.com/apitoken](https://real-debrid.com/apitoken))
 - Set `rclone.uid` and `rclone.gid` to match your `PUID` / `PGID`
 
+> **Note:** The arr API keys (`YOUR_SONARR_API_KEY`, etc.) can only be filled in after Sonarr/Radarr have started for the first time. Leave them as placeholders for now.
+
 ### Step 7 — Update the Honey dashboard domain
 
-`apps/honey/config.json` has the domain hardcoded (it doesn't support env var substitution). Replace every occurrence of `your-domain.com` with your actual domain:
+`apps/honey/config.json` has the domain hardcoded. Replace every occurrence of `your-domain.com` with your actual domain:
 ```bash
 sudo sed -i 's/your-domain.com/example.com/g' apps/honey/config.json
 ```
 
 ### Step 8 — First boot (core only)
 
-Start just the required core services to verify everything works:
+Start just the required core services to verify everything works before enabling the full stack:
 ```bash
 sudo docker compose up -d
 sudo docker compose ps
@@ -148,24 +153,31 @@ cat apps/authelia/config/notification.txt
 
 ## Adding Services
 
-Once core is working, enable services one category at a time.
-
 ### Media stack
 
-Fill in API keys for each service:
+#### Configure per-service credentials
+
+Some services share credentials that **must match**:
+
+| This value... | ...must equal this value |
+|---|---|
+| `DEFAULT_PROXY_CREDENTIALS` in `apps/aiostreams/.env` (the password after `:`) | `API_PASSWORD` in `apps/mediaflow-proxy/.env` |
+| `MEDIAFUSION_API_PASSWORD` in `apps/aiostreams/.env` | `API_PASSWORD` in `apps/mediafusion/.env` |
+
+Fill in the following:
 
 **`apps/aiostreams/.env`** — set at minimum:
-- `DEFAULT_REALDEBRID_API_KEY` — your Real-Debrid key
-- `TMDB_API_KEY` and `TMDB_ACCESS_TOKEN` — from [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api)
 - `SECRET_KEY` — `openssl rand -hex 32`
-- `DEFAULT_PROXY_CREDENTIALS` — set to `:yourpassword` (colon prefix is required)
-- `MEDIAFUSION_API_PASSWORD` — must match `API_PASSWORD` in `apps/mediafusion/.env`
+- `DEFAULT_REALDEBRID_API_KEY` — your Real-Debrid key
+- `TMDB_API_KEY` — from [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api)
+- `DEFAULT_PROXY_CREDENTIALS` — set to `:yourpassword` (the colon prefix is required; the password must match `API_PASSWORD` in mediaflow-proxy)
+- `MEDIAFUSION_API_PASSWORD` — any password (must match `API_PASSWORD` in mediafusion)
 
 **`apps/mediafusion/.env`** — set:
 - `SECRET_KEY` — `openssl rand -hex 32`
 - `API_PASSWORD` — must match `MEDIAFUSION_API_PASSWORD` in aiostreams
 - `TMDB_API_KEY` — same key as above
-- `PROWLARR_API_KEY` — available from Prowlarr UI after first boot (Settings → General)
+- `PROWLARR_API_KEY` — get this from Prowlarr UI after first boot (Settings → General)
 
 **`apps/mediaflow-proxy/.env`** — set:
 - `API_PASSWORD` — must match the password part of `DEFAULT_PROXY_CREDENTIALS` in aiostreams
@@ -179,23 +191,54 @@ Fill in API keys for each service:
 
 **`apps/aiometadata/.env`** — set `TMDB_API`, `TVDB_API_KEY`, `FANART_API_KEY`.
 
-Then enable the media profile group in `.env`:
+#### Enable the media stack
+
+Add the following profiles to `COMPOSE_PROFILES` in `.env`:
 ```
-COMPOSE_PROFILES="required,cloudflare-ddns,warp,honey,jellyfin,seerr,radarr,sonarr,prowlarr,bazarr,flaresolverr,decypharr,aiostreams,mediafusion,comet,stremthru,mediaflow-proxy,aiolists,aiometadata,tmdb-addon,tmdb-collections,zilean,recyclarr"
+COMPOSE_PROFILES="required,cloudflare-ddns,warp,honey,jellyfin,seerr,radarr,sonarr4k,prowlarr,bazarr,flaresolverr,decypharr,aiostreams,mediafusion,comet,stremthru,mediaflow-proxy,aiolists,aiometadata,tmdb-addon,tmdb-collections,zilean,recyclarr"
 ```
 
 ```bash
 sudo docker compose up -d
+sudo docker compose ps  # wait for everything to show healthy
 ```
 
-**After arrs are running**, get their API keys from each UI (Settings → General → API Key) and fill in `apps/recyclarr/secrets.yml`, then restart recyclarr:
-```bash
-sudo docker compose up -d recyclarr
-```
+#### Post-boot UI configuration
+
+Once containers are healthy, do these one-time steps in each service's UI:
+
+**Prowlarr** (`prowlarr.your-domain.com`):
+- Settings → General → copy the API key → paste into `apps/mediafusion/.env` as `PROWLARR_API_KEY`, then `sudo docker compose up -d mediafusion`
+- Indexers → Add Indexer → add the indexers you want (Knaben, Zilean torznab, etc.)
+- Indexers → Add App → add Sonarr4K and Radarr with their API keys and URLs
+
+**Sonarr4K** (`4k.sonarr.your-domain.com`) and **Radarr** (`radarr.your-domain.com`):
+- Settings → General → copy each API key → paste into `apps/decypharr/config.json` (`arrs[].token`), then `sudo docker compose up -d decypharr`
+- Settings → Download Clients → Add → qBittorrent → Host: `decypharr`, Port: `8282`
+- Settings → Media Management → Root Folders → add `/mnt/symlinks/tv` (Sonarr) or `/mnt/symlinks/movies` (Radarr)
+
+**Seerr** (`seerr.your-domain.com`):
+- Connect Radarr and Sonarr4K using their hostnames and API keys
+- Set Radarr as the default for movies, Sonarr4K for TV shows
+
+**Recyclarr** (runs automatically on startup/schedule):
+- Fill `apps/recyclarr/secrets.yml` with the arr API keys, then `sudo docker compose up -d recyclarr`
+- Recyclarr syncs quality profiles and custom formats from TRaSH guides automatically
+
+#### Setting up Stremio streaming
+
+AIOStreams is the single install point for all Stremio addons:
+
+1. Visit `https://aiostreams.your-domain.com` and configure your addons (Real-Debrid key, enable MediaFusion, Comet, StremThru)
+2. Install the generated manifest URL into Stremio (desktop or web app)
+3. Search for any movie or TV show in Stremio — streams from your Real-Debrid library will appear
 
 ### Other tools
 
-Use `grep -r "CHANGEME" apps/` to find any remaining unfilled placeholders before enabling a service.
+Check for any remaining unfilled placeholders before enabling a service:
+```bash
+grep -r "CHANGEME" apps/
+```
 
 Enable individual services by adding their profile name to `COMPOSE_PROFILES` and running `sudo docker compose up -d`.
 
@@ -216,6 +259,36 @@ sudo docker compose ps                                 # check health
 
 ---
 
+## Troubleshooting
+
+**TLS certificate fails / services unreachable**
+- Oracle Cloud users: check VCN Security List has TCP 80 and 443 open (Step 1). This is the most common issue.
+- Check Traefik logs: `sudo docker compose logs -f traefik`
+
+**Container keeps restarting**
+- Check its logs: `sudo docker compose logs --tail=50 <service>`
+- Check health: `sudo docker compose ps`
+
+**Authelia "email" verification code not received**
+- The code is written to a local file, not emailed: `cat apps/authelia/config/notification.txt`
+
+**rclone FUSE mount dies ("Transport endpoint is not connected")**
+- This breaks all symlink-based playback. Fix: `sudo docker compose up -d decypharr` — it remounts on startup.
+
+**No search results in Sonarr/Radarr**
+- Check Prowlarr has indexers configured and they're synced to the arr instances
+- Test indexers directly in Prowlarr (Indexers → Test All)
+
+**Decypharr shows 0 results**
+- Real-Debrid must have the torrent cached. Uncached torrents are skipped (`download_uncached: false`)
+- Verify via Real-Debrid's cache check: [real-debrid.com/torrents](https://real-debrid.com/torrents)
+
+**AIOStreams streams don't work / credential error**
+- Verify `DEFAULT_PROXY_CREDENTIALS` password in `apps/aiostreams/.env` matches `API_PASSWORD` in `apps/mediaflow-proxy/.env`
+- Verify `MEDIAFUSION_API_PASSWORD` in aiostreams matches `API_PASSWORD` in mediafusion
+
+---
+
 ## Directory Layout
 
 - `apps/*/compose.yaml` — service definitions
@@ -227,7 +300,7 @@ sudo docker compose ps                                 # check health
 
 ## Recovery / Fresh Server
 
-Once you've configured everything, push your working copy to a **private** GitHub repo so you can recover from any server loss with two commands.
+Once you've configured everything, push your working copy to a **private** GitHub repo. Recovery from a new server is then two commands.
 
 **Set up SSH access to your private repo:**
 ```bash
