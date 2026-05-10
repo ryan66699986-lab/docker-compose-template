@@ -62,7 +62,7 @@ services:
       - "--entryPoints.websecure.http.encodedcharacters.allowencodedhash=true"
 
       # If you dont mind applying crowdsec to all routers, just uncomment the line below
-      # - "--entryPoints.websecure.http.middlewares=crowdsec@docker"
+      - "--entryPoints.websecure.http.middlewares=crowdsec@docker"
       # You can instead choose to add it to specific routers only
       # e.g. in a service's labels: (dont uncomment the line below)
       # - "traefik.http.routers.myservice.middlewares=crowdsec@docker
