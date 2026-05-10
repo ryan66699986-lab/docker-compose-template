@@ -3,7 +3,7 @@ services:
     image: crowdsecurity/crowdsec
     restart: unless-stopped
     container_name: crowdsec
-    ports:
+    expose:
       - 8080
       - 7422
     environment:
