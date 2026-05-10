@@ -1,0 +1,7 @@
+data/
+apps/crowdsec/config/hub/
+apps/crowdsec/config/online_api_credentials.yaml
+apps/crowdsec/config/local_api_credentials.yaml
+apps/crowdsec/config/notifications/
+apps/authelia/config/notification.txt
+apps/adguard/config/AdGuardHome.yaml

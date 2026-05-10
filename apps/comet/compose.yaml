@@ -1,0 +1,71 @@
+services:
+  comet:
+    container_name: comet
+    image: g0ldyy/comet
+    restart: unless-stopped
+    expose:
+      - 2020
+    environment:
+      DATABASE_TYPE: ${DATABASE_TYPE:-postgresql}
+      DATABASE_URL: ${DATABASE_URL:-comet:comet@comet_postgres:5432/comet}
+    env_file:
+      - .env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.comet.rule=Host(`${COMET_HOSTNAME?}`)
+      - traefik.http.routers.comet.entrypoints=websecure
+      - traefik.http.routers.comet.tls.certresolver=letsencrypt
+      - traefik.http.routers.comet.middlewares=authelia@docker
+    volumes:
+      - ${DOCKER_DATA_DIR}/comet:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:2020/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      comet_postgres:
+        condition: service_healthy
+    profiles:
+      - comet
+      - all
+
+  comet_postgres:
+    container_name: comet_postgres
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: comet
+      POSTGRES_PASSWORD: comet
+      POSTGRES_DB: comet
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=128MB"
+      - "-c"
+      - "effective_cache_size=384MB"
+      - "-c"
+      - "maintenance_work_mem=64MB"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "wal_buffers=8MB"
+      - "-c"
+      - "random_page_cost=1.1"
+      - "-c"
+      - "effective_io_concurrency=200"
+      - "-c"
+      - "work_mem=8MB"
+      - "-c"
+      - "max_connections=100"
+    volumes:
+      - ${DOCKER_DATA_DIR}/comet/postgres:/var/lib/postgresql/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U comet -d comet"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - comet
+      - all

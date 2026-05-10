@@ -1,0 +1,14 @@
+# yamllint disable rule:line-length
+---
+users:
+  your-username:
+    disabled: false
+    displayname: "Your Name"
+    ## Generate with: python3 -c "import bcrypt; print(bcrypt.hashpw(b'YOUR_PASSWORD', bcrypt.gensalt(12)).decode())"
+    password: "$2b$12$REPLACE_WITH_BCRYPT_HASH_OF_YOUR_PASSWORD"
+    email: your@email.com
+    groups:
+      - admins
+      - dev
+...
+# yamllint enable rule:line-length

@@ -1,0 +1,95 @@
+services:
+  mediafusion:
+    image: mhdzumair/mediafusion:latest
+    container_name: mediafusion
+    restart: unless-stopped
+    expose:
+      - 8000
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      mediafusion_postgres:
+        condition: service_healthy
+      mediafusion_redis:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mediafusion.rule=Host(`${MEDIAFUSION_HOSTNAME?}`)"
+      - "traefik.http.routers.mediafusion.entrypoints=websecure"
+      - "traefik.http.routers.mediafusion.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.mediafusion.middlewares=authelia@docker"
+    profiles:
+      - mediafusion
+      - all
+
+  mediafusion_scheduler:
+    image: mhdzumair/mediafusion:latest
+    container_name: mediafusion_scheduler
+    command: ["/mediafusion/.venv/bin/taskiq", "worker", "api.taskiq_worker:broker_default", "--workers", "1"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      mediafusion_postgres:
+        condition: service_healthy
+      mediafusion_redis:
+        condition: service_healthy
+    profiles:
+      - mediafusion
+      - all
+
+  browserless:
+    image: ghcr.io/browserless/chromium
+    container_name: browserless
+    environment:
+      - TIMEOUT=-1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/json/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles:
+      - mediafusion
+      - all
+
+  mediafusion_postgres:
+    image: postgres:17-alpine
+    container_name: mediafusion_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mediafusion
+      POSTGRES_PASSWORD: mediafusion
+      POSTGRES_DB: mediafusion
+    volumes:
+      - ${DOCKER_DATA_DIR}/mediafusion/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mediafusion -d mediafusion"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - mediafusion
+      - all
+
+  mediafusion_redis:
+    image: redis:latest
+    container_name: mediafusion_redis
+    restart: unless-stopped
+    volumes:
+      - ${DOCKER_DATA_DIR}/mediafusion/cache:/data
+    command: redis-server --appendonly yes --save 60 1
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - mediafusion
+      - all

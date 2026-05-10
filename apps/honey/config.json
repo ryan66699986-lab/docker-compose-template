@@ -1,0 +1,197 @@
+{
+	"ui": {
+		"name": "Dashboard",
+		"desc": "Nice and sweet place for all your self-hosted services.",
+		"icon": "img/icon.png",
+		"wallpaper": "img/background.jpg",
+		"wallpaper_dark": "img/background-dark.jpg",
+		"dark_mode": "Auto",
+		"open_new_tab": true,
+		"ping_dots": false,
+		"blur": true,
+		"animations": true,
+		"trusted_domains": ["your-domain.com"]
+	},
+	"services": [
+		{
+			"name": "Jellyfin",
+			"desc": "Self-hosted media server.",
+			"href": "https://jellyfin.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/jellyfin/jellyfin-ux/refs/heads/master/branding/tizen/icon.png"
+		},
+		{
+			"name": "Seerr",
+			"desc": "Media request management for Jellyfin.",
+			"href": "https://seerr.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/fallenbagel/jellyseerr/refs/heads/develop/public/android-chrome-512x512.png"
+		},
+		{
+			"name": "Streamystats",
+			"desc": "Jellyfin playback statistics and analytics.",
+			"href": "https://streamystats.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/streamystats.png"
+		},
+		{
+			"name": "AIOStreams",
+			"desc": "All-in-one streaming add-on for Stremio.",
+			"href": "https://aiostreams.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/Viren070/AIOStreams/refs/heads/main/packages/frontend/public/assets/logo.png"
+		},
+		{
+			"name": "Mediafusion",
+			"desc": "All-in-one Stremio add-on with torrent and debrid support.",
+			"href": "https://mediafusion.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/mhdzumair/MediaFusion/main/resources/images/mediafusion_logo.png"
+		},
+		{
+			"name": "Comet",
+			"desc": "Stremio add-on for debrid streaming with advanced filtering.",
+			"href": "https://comet.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/g0ldyy/comet/main/comet/assets/icon.png"
+		},
+		{
+			"name": "AIOLists",
+			"desc": "Stremio add-on for lists from Trakt, IMDB, TMDB and more.",
+			"href": "https://aiolists.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/SebastianMorel/AIOLists/main/public/assets/image.png"
+		},
+		{
+			"name": "AIOMetadata",
+			"desc": "All-in-one metadata add-on for Stremio.",
+			"href": "https://aiometadata.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/cedya77/aiometadata/refs/heads/dev/public/logo.png"
+		},
+		{
+			"name": "StremThru",
+			"desc": "Companion suite for Stremio with debrid and proxy support.",
+			"href": "https://stremthru.your-domain.com",
+			"icon": "https://emojiapi.dev/api/v1/sparkles/256.png"
+		},
+		{
+			"name": "TMDB Addon",
+			"desc": "Stremio add-on for TMDB metadata.",
+			"href": "https://tmdb.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/mrcanelas/tmdb-addon/refs/heads/main/public/logo.png"
+		},
+		{
+			"name": "TMDB Collections",
+			"desc": "Stremio add-on for TMDB movie collections and franchises.",
+			"href": "https://tmdb-collections.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/mrcanelas/tmdb-addon/refs/heads/main/public/logo.png"
+		},
+		{
+			"name": "Mediaflow Proxy",
+			"desc": "Stream proxy for geo-restricted or CDN-limited content.",
+			"href": "https://mediaflow-proxy.your-domain.com",
+			"icon": "https://mediaflow-proxy.your-domain.com/logo.png"
+		},
+		{
+			"name": "Zilean",
+			"desc": "DMM torrent index for improved Prowlarr search results.",
+			"href": "https://zilean.your-domain.com",
+			"icon": "https://zilean.your-domain.com/images/zilean-logo.png"
+		},
+		{
+			"name": "Sonarr",
+			"desc": "Automated TV show management.",
+			"href": "https://4k.sonarr.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/Sonarr/Sonarr/develop/Logo/512.png"
+		},
+		{
+			"name": "Radarr",
+			"desc": "Automated movie management.",
+			"href": "https://radarr.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/512.png"
+		},
+		{
+			"name": "Radarr 4K",
+			"desc": "Automated 4K movie management.",
+			"href": "https://4k.radarr.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/512.png"
+		},
+		{
+			"name": "Prowlarr",
+			"desc": "Indexer manager for the arr stack.",
+			"href": "https://prowlarr.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/Prowlarr/Prowlarr/refs/heads/develop/Logo/512.png"
+		},
+		{
+			"name": "Bazarr",
+			"desc": "Automatic subtitle downloader for Sonarr and Radarr.",
+			"href": "https://bazarr.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/morpheus65535/bazarr/master/frontend/public/images/logo128.png"
+		},
+		{
+			"name": "Bazarr 4K",
+			"desc": "Automatic subtitle downloader for 4K content.",
+			"href": "https://4k.bazarr.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/morpheus65535/bazarr/master/frontend/public/images/logo128.png"
+		},
+		{
+			"name": "Decypharr",
+			"desc": "Real-Debrid blackhole and symlink manager.",
+			"href": "https://decypharr.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/sirrobot01/decypharr/main/docs/public/favicon.png"
+		},
+		{
+			"name": "Vaultwarden",
+			"desc": "Self-hosted password manager.",
+			"href": "https://vaultwarden.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/dani-garcia/vaultwarden/6edceb5f7acfee8ffe1ae2f07afd76dc588dda60/resources/vaultwarden-icon.svg"
+		},
+		{
+			"name": "YamTrack",
+			"desc": "Media tracking for movies, shows, games and more.",
+			"href": "https://yamtrack.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/yamtrack.png"
+		},
+		{
+			"name": "SearXNG",
+			"desc": "Privacy-respecting meta search engine.",
+			"href": "https://searxng.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/searxng/searxng/refs/heads/master/searx/static/themes/simple/img/favicon.png"
+		},
+		{
+			"name": "AdGuard",
+			"desc": "Network-wide ad and tracker blocking.",
+			"href": "https://adguard.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/adguard-home.png"
+		},
+		{
+			"name": "Traefik",
+			"desc": "HTTP reverse proxy and load balancer.",
+			"href": "https://traefik.your-domain.com",
+			"icon": "https://icon.icepanel.io/Technology/svg/Traefik-Proxy.svg"
+		},
+		{
+			"name": "Authelia",
+			"desc": "Authentication and authorization service.",
+			"href": "https://auth.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/authelia/authelia/refs/heads/master/docs/static/svgs/branding/logo-cropped.svg"
+		},
+		{
+			"name": "Portainer",
+			"desc": "Docker container management.",
+			"href": "https://portainer.your-domain.com",
+			"icon": "https://avatars.githubusercontent.com/u/22225832?s=280&v=4"
+		},
+		{
+			"name": "Dozzle",
+			"desc": "Real-time Docker log viewer.",
+			"href": "https://dozzle.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/amir20/dozzle/19bb8659135e4232523d45ff8e948a0907b2701c/docs/public/logo.svg"
+		},
+		{
+			"name": "Beszel",
+			"desc": "Lightweight server and container monitoring.",
+			"href": "https://beszel.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/beszel.png"
+		},
+		{
+			"name": "Uptime Kuma",
+			"desc": "Self-hosted uptime monitor and status page.",
+			"href": "https://status.your-domain.com",
+			"icon": "https://raw.githubusercontent.com/louislam/uptime-kuma/refs/heads/master/public/favicon.ico"
+		}
+	]
+}
