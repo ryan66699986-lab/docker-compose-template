@@ -74,7 +74,7 @@ sudo firewall-cmd --reload
 ### Step 2 — Clone the repo
 
 ```bash
-sudo git clone https://github.com/YOUR_USERNAME/docker-stack-public.git /opt/docker/docker
+sudo git clone https://github.com/YOUR_USERNAME/SelfHosted-Debrid-Media-Stack-Oracle-ARM.git /opt/docker/docker
 cd /opt/docker/docker
 ```
 
