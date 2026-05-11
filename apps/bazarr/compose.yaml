@@ -42,7 +42,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ:-UTC}
-    volumes: 
+    volumes:
       - ${DOCKER_DATA_DIR}/bazarr/4k/config:/config
       - ${DOCKER_DATA_DIR}/bazarr/4k/data:/data
       - /mnt:/mnt:rslave
