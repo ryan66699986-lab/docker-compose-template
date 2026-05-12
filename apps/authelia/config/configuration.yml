@@ -723,7 +723,7 @@ access_control:
 
   rules:
 
-    ## Apply page specific protection to stremio addons after escaping dots and replacing commans with pipes in the 
+    ## Apply page specific protection to stremio addons after escaping dots and replacing commans with pipes in the
     ## comma separated list of hostnames defined in the environment variable TEMPLATE_STREMIO_ADDON_HOSTNAMES.
     ## This ensures that addons are still usable while protecting important pages.
     - domain_regex: '^({{ env "TEMPLATE_STREMIO_ADDON_HOSTNAMES" | replace "," "|" | replace "." "\\." | replace " " ""}})$'

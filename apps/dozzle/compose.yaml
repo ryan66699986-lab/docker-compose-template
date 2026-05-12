@@ -3,7 +3,7 @@ services:
     image: amir20/dozzle:latest
     container_name: dozzle
     restart: unless-stopped
-    expose: 
+    expose:
       - 8080
     environment:
       - DOZZLE_ENABLE_ACTIONS=true

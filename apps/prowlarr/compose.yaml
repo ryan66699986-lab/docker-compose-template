@@ -6,7 +6,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - UMASK=002
-      - TZ=${TZ:-UTC}  
+      - TZ=${TZ:-UTC}
     expose:
       - 9696
     volumes:

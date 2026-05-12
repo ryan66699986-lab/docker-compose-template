@@ -14,7 +14,7 @@ services:
       TEMPLATE_AUTHELIA_WEBAUTHN_DISPLAY_NAME: ${AUTHELIA_WEBAUTHN_DISPLAY_NAME?}
       TEMPLATE_AUTHELIA_JWT_SECRET: ${AUTHELIA_JWT_SECRET?}
       # A list of domains to apply page specific rules to.
-      # Although we can't fully protect Stremio addons, we can still add authentication to specific pages like the configuration pages. 
+      # Although we can't fully protect Stremio addons, we can still add authentication to specific pages like the configuration pages.
       # All the domains within this comma separated list will have specific pages protected with Authelia.
       # Do NOT include non-stremio addon domains here. It would mean that those services would not be fully protected, or in most cases not protected at all.
       TEMPLATE_STREMIO_ADDON_HOSTNAMES: >-
@@ -46,7 +46,7 @@ services:
       - authelia
       - required
       - all
-  
+
   authelia_redis:
     image: redis:latest
     container_name: authelia_redis

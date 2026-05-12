@@ -17,7 +17,7 @@ services:
     profiles:
       - beszel
       - all
-  
+
   beszel_agent:
     image: henrygd/beszel-agent:latest
     container_name: beszel_agent

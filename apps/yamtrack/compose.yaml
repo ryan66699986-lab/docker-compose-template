@@ -20,7 +20,7 @@ services:
     profiles:
       - yamtrack
       - all
-    
+
 
   yamtrack_redis:
     image: redis:7-alpine

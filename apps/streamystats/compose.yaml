@@ -59,7 +59,7 @@ services:
     profiles:
       - streamystats
       - all
-    
+
   streamystats_postgres:
     image: tensorchord/vchord-postgres:pg17-v0.4.1
     container_name: streamystats_postgres
@@ -81,7 +81,7 @@ services:
     profiles:
       - streamystats
       - all
-  
+
   streamystats_migrations:
     image: fredrikburmester/streamystats-v2-migrate:latest
     container_name: streamystats_migrations
